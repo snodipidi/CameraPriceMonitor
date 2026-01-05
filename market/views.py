@@ -1,5 +1,7 @@
 from django.views.generic import ListView, DetailView
 from .models import CameraModel, Listing
+from django.db.models import Avg, Min, Max, Count
+
 
 
 class CameraModelListView(ListView):
@@ -15,5 +17,14 @@ class CameraModelDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["listings"] = Listing.objects.filter(camera_model=self.object).order_by("-fetched_at")
+
+        qs = Listing.objects.filter(camera_model=self.object)
+
+        context["listings"] = qs.order_by("-fetched_at")
+        context["stats"] = qs.aggregate(
+            count=Count("id"),
+            avg=Avg("price"),
+            min=Min("price"),
+            max=Max("price"),
+        )
         return context

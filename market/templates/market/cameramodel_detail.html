@@ -1,4 +1,13 @@
 <h1>{{ camera }}</h1>
+
+<h2>Статистика</h2>
+<ul>
+  <li>Объявлений: {{ stats.count }}</li>
+  <li>Средняя цена: {{ stats.avg }}</li>
+  <li>Минимум: {{ stats.min }}</li>
+  <li>Максимум: {{ stats.max }}</li>
+</ul>
+
 <h2>Объявления</h2>
 <ul>
   {% for l in listings %}
