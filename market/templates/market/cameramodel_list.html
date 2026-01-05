@@ -1,0 +1,9 @@
+<h1>Каталог моделей</h1>
+
+<ul>
+  {% for m in models %}
+    <li><a href="{% url 'model_detail' m.pk %}">{{ m }}</a></li>
+  {% empty %}
+    <li>Пока нет моделей</li>
+  {% endfor %}
+</ul>
