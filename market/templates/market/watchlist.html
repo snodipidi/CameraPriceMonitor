@@ -1,0 +1,9 @@
+<h1>Мои отслеживания</h1>
+
+<ul>
+  {% for w in items %}
+    <li>{{ w.camera_model }} — цель: {{ w.target_price }}</li>
+  {% empty %}
+    <li>Пока ничего не отслеживается</li>
+  {% endfor %}
+</ul>

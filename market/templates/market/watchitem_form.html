@@ -1,0 +1,9 @@
+<h1>Отслеживать: {{ view.camera }}</h1>
+
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Сохранить</button>
+</form>
+
+<p><a href="{% url 'watchlist' %}">Назад к списку</a></p>

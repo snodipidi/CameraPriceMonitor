@@ -94,9 +94,17 @@ class PriceSnapshot(models.Model):
 # Отслеживание модели камеры конкретным пользователем
 class WatchItem(models.Model):
     # Ссылка на пользователя
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="watch_items",
+    )
     # Что именно пользователь отслеживает
-    camera_model = models.ForeignKey(CameraModel, on_delete=models.CASCADE)
+    camera_model = models.ForeignKey(
+        CameraModel,
+        on_delete=models.CASCADE,
+        related_name="watch_items",
+    )
     # Целевая цена
     target_price = models.IntegerField()
 
@@ -109,3 +117,14 @@ class WatchItem(models.Model):
     region = models.CharField(max_length=120, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "camera_model"],
+                name="uniq_watchitem_user_camera_model",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.user} → {self.camera_model} (<= {self.target_price})"

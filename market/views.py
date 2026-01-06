@@ -1,7 +1,13 @@
-from django.views.generic import ListView, DetailView
-from .models import CameraModel, Listing
+from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator
 from django.db.models import Avg, Min, Max, Count
+from django.shortcuts import get_object_or_404
+from django.urls import reverse
+from django.views.generic import ListView, DetailView, CreateView
 
+from .forms import WatchItemCreateForm
+from .models import CameraModel, Listing, WatchItem
 
 
 class CameraModelListView(ListView):
@@ -18,13 +24,59 @@ class CameraModelDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        qs = Listing.objects.filter(camera_model=self.object)
+        qs = Listing.objects.filter(camera_model=self.object).order_by("-fetched_at")
 
-        context["listings"] = qs.order_by("-fetched_at")
         context["stats"] = qs.aggregate(
             count=Count("id"),
             avg=Avg("price"),
             min=Min("price"),
             max=Max("price"),
         )
+
+        paginator = Paginator(qs, 50)
+        page_number = self.request.GET.get("page")
+        page_obj = paginator.get_page(page_number)
+
+        context["page_obj"] = page_obj
+        context["listings"] = page_obj.object_list
         return context
+
+
+class WatchItemCreateView(LoginRequiredMixin, CreateView):
+    model = WatchItem
+    form_class = WatchItemCreateForm
+    template_name = "market/watchitem_form.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.camera = get_object_or_404(CameraModel, pk=kwargs["pk"])
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        form.instance.camera_model = self.camera
+
+        try:
+            response = super().form_valid(form)
+        except Exception:
+            form.add_error(None, "Вы уже отслеживаете эту модель")
+            return self.form_invalid(form)
+
+        messages.success(self.request, "Отслеживание сохранено")
+        return response
+
+    def get_success_url(self):
+        return reverse("watchlist")
+
+
+class WatchListView(LoginRequiredMixin, ListView):
+    model = WatchItem
+    template_name = "market/watchlist.html"
+    context_object_name = "items"
+
+    def get_queryset(self):
+        return (
+            WatchItem.objects
+            .filter(user=self.request.user)
+            .select_related("camera_model", "camera_model__brand")
+            .order_by("-created_at")
+        )

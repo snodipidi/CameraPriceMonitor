@@ -11,8 +11,29 @@
 <h2>Объявления</h2>
 <ul>
   {% for l in listings %}
-    <li>{{ l.price }} {{ l.currency }} — {{ l.region }} — <a href="{{ l.url }}" target="_blank">{{ l.title }}</a></li>
+    <li>
+      {{ l.price }} {{ l.currency }} — {{ l.region }} —
+      <a href="{{ l.url }}" target="_blank">{{ l.title }}</a>
+    </li>
   {% empty %}
     <li>Пока нет объявлений</li>
   {% endfor %}
 </ul>
+
+<div style="margin-top: 16px;">
+  {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}">← Предыдущая</a>
+  {% endif %}
+
+  <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+
+  {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}">Следующая →</a>
+  {% endif %}
+</div>
+
+{% if user.is_authenticated %}
+  <p><a href="{% url 'watch_add' camera.id %}">Отслеживать (задать цель)</a></p>
+{% else %}
+  <p><a href="{% url 'login' %}">Войти</a>, чтобы отслеживать цену</p>
+{% endif %}
