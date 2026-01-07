@@ -5,6 +5,7 @@ from django.db.models import Avg, Min, Max, Count
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import UpdateView
 
 from .forms import WatchItemCreateForm
 from .models import CameraModel, Listing, WatchItem
@@ -80,3 +81,15 @@ class WatchListView(LoginRequiredMixin, ListView):
             .select_related("camera_model", "camera_model__brand")
             .order_by("-created_at")
         )
+
+class WatchItemUpdateView(LoginRequiredMixin, UpdateView):
+    model = WatchItem
+    form_class = WatchItemCreateForm
+    template_name = "market/watchitem_form.html"  # можно переиспользовать
+
+    def get_queryset(self):
+        return WatchItem.objects.filter(user=self.request.user)
+
+    def get_success_url(self):
+        messages.success(self.request, "Отслеживание обновлено")
+        return reverse("watchlist")
