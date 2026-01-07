@@ -34,6 +34,11 @@ class CameraModelDetailView(DetailView):
             max=Max("price"),
         )
 
+        stats = context["stats"]
+        avg_price = stats.get("avg") or 0
+        context["good_deal_threshold"] = int(avg_price * 0.9)  # -10%
+
+
         paginator = Paginator(qs, 50)
         page_number = self.request.GET.get("page")
         page_obj = paginator.get_page(page_number)
@@ -85,7 +90,7 @@ class WatchListView(LoginRequiredMixin, ListView):
 class WatchItemUpdateView(LoginRequiredMixin, UpdateView):
     model = WatchItem
     form_class = WatchItemCreateForm
-    template_name = "market/watchitem_form.html"  # можно переиспользовать
+    template_name = "market/watchitem_form.html"
 
     def get_queryset(self):
         return WatchItem.objects.filter(user=self.request.user)

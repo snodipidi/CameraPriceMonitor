@@ -17,6 +17,9 @@
   <ul>
     {% for l in listings %}
       <li>
+        {% if good_deal_threshold and l.price <= good_deal_threshold %}
+          <strong>Выгодно:</strong>
+        {% endif %}
         {{ l.price }} {{ l.currency }} — {{ l.region }} —
         <a href="{{ l.url }}" target="_blank">{{ l.title }}</a>
       </li>
@@ -24,6 +27,7 @@
       <li>Пока нет объявлений</li>
     {% endfor %}
   </ul>
+
 
   <div style="margin-top: 16px;">
     {% if page_obj.has_previous %}
