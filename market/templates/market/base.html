@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}CameraPriceMonitor{% endblock %}</title>
+</head>
+<body>
+
+  <header>
+    <p><a href="{% url 'camera_list' %}">CameraPriceMonitor</a></p>
+
+    {% if user.is_authenticated %}
+      <p>
+        {{ user.username }} |
+        <a href="{% url 'watchlist' %}">Мои отслеживания</a> |
+        <form method="post" action="{% url 'logout' %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit">Выйти</button>
+        </form>
+      </p>
+    {% else %}
+      <p><a href="{% url 'login' %}">Войти</a></p>
+    {% endif %}
+  </header>
+
+  {% if messages %}
+    <ul>
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+</body>
+</html>

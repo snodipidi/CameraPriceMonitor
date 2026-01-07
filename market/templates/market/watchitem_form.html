@@ -1,9 +1,15 @@
-<h1>Отслеживать: {{ view.camera }}</h1>
+{% extends "market/base.html" %}
+{% block content %}
 
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Сохранить</button>
-</form>
 
-<p><a href="{% url 'watchlist' %}">Назад к списку</a></p>
+  <h1>Отслеживать: {{ view.camera }}</h1>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Сохранить</button>
+  </form>
+
+  <p><a href="{% url 'watchlist' %}">Назад к списку</a></p>
+
+{% endblock %}

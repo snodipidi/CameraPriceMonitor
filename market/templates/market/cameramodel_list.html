@@ -1,11 +1,18 @@
-<h1>Каталог моделей</h1>
+{% extends "market/base.html" %}
+{% block content %}
 
-<ul>
-  {% for m in models %}
-    <li><a href="{% url 'camera_detail' m.id %}">{{ m }}</a></li>
-  {% empty %}
-    <li>Пока нет моделей</li>
-  {% endfor %}
-</ul>
+
+  <h1>Каталог моделей</h1>
+
+  <ul>
+    {% for m in models %}
+      <li><a href="{% url 'camera_detail' m.id %}">{{ m }}</a></li>
+    {% empty %}
+      <li>Пока нет моделей</li>
+    {% endfor %}
+  </ul>
+
+{% endblock %}
+
 
 

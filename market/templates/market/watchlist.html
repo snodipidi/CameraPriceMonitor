@@ -1,9 +1,19 @@
-<h1>Мои отслеживания</h1>
+{% extends "market/base.html" %}
+{% block content %}
 
-<ul>
+
+  <h1>Мои отслеживания</h1>
+
+  <ul>
   {% for w in items %}
-    <li>{{ w.camera_model }} — цель: {{ w.target_price }}</li>
+    <li>
+      {{ w.camera_model }} — цель: {{ w.target_price }}
+      (<a href="{% url 'watch_edit' w.id %}">изменить</a>)
+    </li>
   {% empty %}
     <li>Пока ничего не отслеживается</li>
   {% endfor %}
 </ul>
+
+
+{% endblock %}
