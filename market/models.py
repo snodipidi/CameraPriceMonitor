@@ -27,6 +27,8 @@ class CameraModel(models.Model):
     release_year = models.PositiveSmallIntegerField(null=True, blank=True)
     mount = models.CharField(max_length=50, null=True, blank=True)
     sensor_type = models.CharField(max_length=50, null=True, blank=True)
+    avito_search_url = models.URLField(blank=True, default="")
+
 
     def __str__(self):
         return f"{self.brand.name} {self.name}"
@@ -45,14 +47,11 @@ class Listing(models.Model):
         PARTS = "parts", "For parts"
 
     # Объявление относится к конкретной модели камеры
-    camera_model = models.ForeignKey(
-        CameraModel,
-        on_delete=models.CASCADE,
-        related_name="listings",
-    )
+    camera_model = models.ForeignKey(CameraModel, on_delete=models.CASCADE)
+
 
     source = models.CharField(max_length=20, choices=Source.choices)
-    external_id = models.CharField(max_length=100, null=True, blank=True)
+    external_id = models.CharField(max_length=100)
     title = models.CharField(max_length=255)
     url = models.URLField(max_length=500)
     price = models.IntegerField()
@@ -69,10 +68,19 @@ class Listing(models.Model):
     seller_type = models.CharField(max_length=50, null=True, blank=True)
     posted_date = models.DateField(null=True, blank=True)
     fetched_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+    last_seen_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["source", "external_id"],
+                name="uniq_listing_source_external_id",
+            )
+        ]
 
     def __str__(self):
-        return self.title
-
+        return self.title    
 
 # Срез цены во времени
 class PriceSnapshot(models.Model):
