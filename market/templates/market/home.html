@@ -1,1 +1,48 @@
-<h1>CameraPriceMonitor</h1>
+{% extends "base.html" %}
+
+{% block title %}Главная — CameraPriceMonitor{% endblock %}
+
+{% block content %}
+  <div class="p-4 p-md-5 mb-4 bg-white border rounded-3">
+    <h1 class="display-6 mb-2">CameraPriceMonitor</h1>
+    <p class="text-muted mb-0">
+      Собираем объявления, показываем актуальные цены и помогаем отслеживать интересные модели.
+    </p>
+  </div>
+
+  <div class="row row-cols-1 row-cols-md-3 g-3">
+    <div class="col">
+      <div class="card h-100">
+        <div class="card-body">
+          <h2 class="h5">Модели</h2>
+          <p class="text-muted">Список моделей и параметры поиска.</p>
+          <a class="btn btn-primary" href="{% url 'camera_list' %}">Открыть</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card h-100">
+        <div class="card-body">
+          <h2 class="h5">Мои отслеживания</h2>
+          <p class="text-muted">Сохраняй модели и проверяй изменения цен.</p>
+          {% if user.is_authenticated %}
+            <a class="btn btn-outline-primary" href="{% url 'watchlist' %}">Открыть</a>
+          {% else %}
+            <a class="btn btn-outline-primary" href="{% url 'login' %}">Войти</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card h-100">
+        <div class="card-body">
+          <h2 class="h5">Обновить данные</h2>
+          <p class="text-muted">Запусти сбор объявлений (пока через команду).</p>
+          <span class="badge text-bg-secondary">management command</span>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
