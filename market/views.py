@@ -15,6 +15,14 @@ class CameraModelListView(ListView):
     model = CameraModel
     template_name = "market/cameramodel_list.html"
     context_object_name = "models"
+    
+    def get_queryset(self):
+        return CameraModel.objects.select_related('brand').annotate(
+            listings_count=Count('listing', distinct=True),
+            avg_price=Avg('listing__price'),
+            min_price=Min('listing__price'),
+            max_price=Max('listing__price'),
+        ).order_by('brand__name', 'name')
 
 
 class CameraModelDetailView(DetailView):

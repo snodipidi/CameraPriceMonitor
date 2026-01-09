@@ -19,8 +19,8 @@ def get_html(url: str) -> str:
 
         page.goto(url, wait_until="domcontentloaded", timeout=0)
 
-        print("Если появилась капча — пройди её в этом окне. НЕ закрывай вкладку/браузер.")
-        input("Когда откроется список объявлений — нажми Enter...")
+        print("Если появилась капча — пройдите её в этом окне. НЕ закрывайте вкладку/браузер.")
+        input("Когда откроется список объявлений — нажмите Enter...")
 
         last_err = None
         try:
@@ -82,10 +82,6 @@ def looks_like_camera_listing(title: str) -> bool:
 
 
 def extract_avito_id(url: str) -> str | None:
-    """
-    Достаёт числовой id объявления из URL.
-    На практике у Avito в ссылке почти всегда есть длинная последовательность цифр.
-    """
     m = re.search(r"(\d{6,})", url)
     return m.group(1) if m else None
 

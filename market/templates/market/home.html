@@ -3,44 +3,113 @@
 {% block title %}Главная — CameraPriceMonitor{% endblock %}
 
 {% block content %}
-  <div class="p-4 p-md-5 mb-4 bg-white border rounded-3">
-    <h1 class="display-6 mb-2">CameraPriceMonitor</h1>
-    <p class="text-muted mb-0">
-      Собираем объявления, показываем актуальные цены и помогаем отслеживать интересные модели.
-    </p>
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="container">
+      <h1>CameraPriceMonitor</h1>
+      <p>
+        Собираем объявления, показываем актуальные цены и помогаем отслеживать интересные модели камер.
+        Находи лучшие предложения и не упускай выгодные сделки!
+      </p>
+    </div>
   </div>
 
-  <div class="row row-cols-1 row-cols-md-3 g-3">
+  <!-- Feature Cards -->
+  <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
     <div class="col">
-      <div class="card h-100">
-        <div class="card-body">
-          <h2 class="h5">Модели</h2>
-          <p class="text-muted">Список моделей и параметры поиска.</p>
-          <a class="btn btn-primary" href="{% url 'camera_list' %}">Открыть</a>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+            <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v8.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"/>
+          </svg>
         </div>
+        <h2>Каталог моделей</h2>
+        <p>Просматривай полный список моделей камер с подробными характеристиками и актуальными ценами на рынке.</p>
+        <a class="btn btn-primary w-100" href="{% url 'camera_list' %}">Перейти к моделям</a>
       </div>
     </div>
 
     <div class="col">
-      <div class="card h-100">
-        <div class="card-body">
-          <h2 class="h5">Мои отслеживания</h2>
-          <p class="text-muted">Сохраняй модели и проверяй изменения цен.</p>
-          {% if user.is_authenticated %}
-            <a class="btn btn-outline-primary" href="{% url 'watchlist' %}">Открыть</a>
-          {% else %}
-            <a class="btn btn-outline-primary" href="{% url 'login' %}">Войти</a>
-          {% endif %}
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0z"/>
+            <path d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l7-7z"/>
+          </svg>
         </div>
+        <h2>Мои отслеживания</h2>
+        <p>Сохраняй интересующие модели и получай уведомления об изменении цен. Следи за выгодными предложениями!</p>
+        {% if user.is_authenticated %}
+          <a class="btn btn-outline-primary w-100" href="{% url 'watchlist' %}">Открыть отслеживания</a>
+        {% else %}
+          <a class="btn btn-outline-primary w-100" href="{% url 'login' %}">Войти для доступа</a>
+        {% endif %}
       </div>
     </div>
 
     <div class="col">
-      <div class="card h-100">
-        <div class="card-body">
-          <h2 class="h5">Обновить данные</h2>
-          <p class="text-muted">Запусти сбор объявлений (пока через команду).</p>
-          <span class="badge text-bg-secondary">management command</span>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 1-.5.5H4.5a.5.5 0 0 0 0 1H7a.5.5 0 0 0 .5-.5V3.5z"/>
+            <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
+          </svg>
+        </div>
+        <h2>Обновление данных</h2>
+        <p>Система автоматически собирает новые объявления и обновляет цены. Актуальная информация всегда под рукой.</p>
+        <span class="badge text-bg-secondary">Management command</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info Section -->
+  <div class="row mt-5">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+          <h3 class="h5 mb-3">Как это работает?</h3>
+          <div class="row g-4">
+            <div class="col-md-4">
+              <div class="d-flex align-items-start">
+                <div class="me-3">
+                  <div class="bg-primary bg-opacity-10 rounded-circle p-2 text-primary">
+                    <strong>1</strong>
+                  </div>
+                </div>
+                <div>
+                  <h5 class="h6 mb-2">Выбери модель</h5>
+                  <p class="text-muted small mb-0">Просмотри каталог и найди интересующую тебя модель камеры</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="d-flex align-items-start">
+                <div class="me-3">
+                  <div class="bg-primary bg-opacity-10 rounded-circle p-2 text-primary">
+                    <strong>2</strong>
+                  </div>
+                </div>
+                <div>
+                  <h5 class="h6 mb-2">Добавь в отслеживание</h5>
+                  <p class="text-muted small mb-0">Сохрани модель и установи желаемую цену для отслеживания</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="d-flex align-items-start">
+                <div class="me-3">
+                  <div class="bg-primary bg-opacity-10 rounded-circle p-2 text-primary">
+                    <strong>3</strong>
+                  </div>
+                </div>
+                <div>
+                  <h5 class="h6 mb-2">Получай обновления</h5>
+                  <p class="text-muted small mb-0">Следи за изменением цен и находи лучшие предложения</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
