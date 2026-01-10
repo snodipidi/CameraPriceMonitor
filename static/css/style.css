@@ -735,6 +735,42 @@ h1.mb-0 {
     cursor: not-allowed;
 }
 
+/* Analytics Section */
+.analytics-section {
+    margin-top: 2rem;
+}
+
+.prediction-card {
+    background: linear-gradient(135deg, #faf8f5 0%, #f5f0e8 100%);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.prediction-price {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.chart-card {
+    background: var(--background-white);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.chart-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.charts-grid {
+    margin-top: 2rem;
+}
+
 @media (max-width: 768px) {
     .camera-detail-card {
         padding: 1.5rem;
@@ -754,5 +790,17 @@ h1.mb-0 {
     
     .listing-price {
         font-size: 1.25rem;
+    }
+    
+    .chart-card {
+        padding: 1rem;
+    }
+    
+    .prediction-card {
+        padding: 1rem;
+    }
+    
+    .prediction-price {
+        font-size: 1.5rem;
     }
 }

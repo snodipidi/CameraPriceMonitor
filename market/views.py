@@ -1,3 +1,4 @@
+import pandas as pd
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
@@ -8,7 +9,15 @@ from django.views.generic import ListView, DetailView, CreateView
 from django.views.generic import UpdateView
 
 from .forms import WatchItemCreateForm
-from .models import CameraModel, Listing, WatchItem
+from .models import CameraModel, Listing, WatchItem, PriceSnapshot
+from .analytics import (
+    calculate_price_statistics,
+    create_price_distribution_chart,
+    create_price_timeline_chart,
+    create_price_by_source_chart,
+    create_price_by_condition_chart,
+    predict_price_trend,
+)
 
 
 class CameraModelListView(ListView):
@@ -33,9 +42,16 @@ class CameraModelDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        qs = Listing.objects.filter(camera_model=self.object).order_by("-fetched_at")
+        # Получаем все объявления для модели
+        listings_qs = Listing.objects.filter(camera_model=self.object).order_by("-fetched_at")
+        
+        # Получаем историю цен из PriceSnapshot
+        snapshots_qs = PriceSnapshot.objects.filter(
+            listing__camera_model=self.object
+        ).select_related('listing').order_by('checked_at')
 
-        context["stats"] = qs.aggregate(
+        # Базовая статистика через ORM
+        context["stats"] = listings_qs.aggregate(
             count=Count("id"),
             avg=Avg("price"),
             min=Min("price"),
@@ -46,8 +62,77 @@ class CameraModelDetailView(DetailView):
         avg_price = stats.get("avg") or 0
         context["good_deal_threshold"] = int(avg_price * 0.9)  # -10%
 
+        # Создаем DataFrame для аналитики
+        if listings_qs.exists():
+            listings_data = []
+            for listing in listings_qs:
+                listings_data.append({
+                    'id': listing.id,
+                    'price': listing.price,
+                    'source': listing.source,
+                    'condition': listing.condition,
+                    'region': listing.region,
+                    'fetched_at': listing.fetched_at,
+                    'posted_date': listing.posted_date,
+                })
+            
+            df_listings = pd.DataFrame(listings_data)
+            
+            # Расширенная статистика через Pandas
+            extended_stats = calculate_price_statistics(df_listings)
+            context["extended_stats"] = extended_stats
+            
+            # Используем медиану для определения выгодных предложений
+            median_price = extended_stats.get('median', avg_price)
+            context["good_deal_threshold"] = int(median_price * 0.9)  # -10% от медианы
+            
+            # Создаем графики
+            context["price_distribution_chart"] = create_price_distribution_chart(
+                df_listings, 
+                f"Распределение цен: {self.object}"
+            )
+            
+            context["price_timeline_chart"] = create_price_timeline_chart(
+                df_listings,
+                f"Динамика цен: {self.object}"
+            )
+            
+            context["price_by_source_chart"] = create_price_by_source_chart(
+                df_listings,
+                f"Сравнение цен по источникам: {self.object}"
+            )
+            
+            if 'condition' in df_listings.columns and df_listings['condition'].notna().any():
+                context["price_by_condition_chart"] = create_price_by_condition_chart(
+                    df_listings,
+                    f"Цены по состоянию: {self.object}"
+                )
+            
+            # Прогнозирование тренда
+            if len(df_listings) >= 3:
+                # Для прогноза используем историю цен из PriceSnapshot, если есть
+                if snapshots_qs.exists():
+                    snapshots_data = []
+                    for snapshot in snapshots_qs:
+                        snapshots_data.append({
+                            'price': snapshot.price,
+                            'checked_at': snapshot.checked_at,
+                        })
+                    df_snapshots = pd.DataFrame(snapshots_data)
+                    context["price_prediction"] = predict_price_trend(df_snapshots)
+                else:
+                    # Если нет истории, используем объявления
+                    context["price_prediction"] = predict_price_trend(df_listings)
+        else:
+            context["extended_stats"] = calculate_price_statistics(pd.DataFrame())
+            context["price_distribution_chart"] = ""
+            context["price_timeline_chart"] = ""
+            context["price_by_source_chart"] = ""
+            context["price_by_condition_chart"] = ""
+            context["price_prediction"] = None
 
-        paginator = Paginator(qs, 50)
+        # Пагинация для списка объявлений
+        paginator = Paginator(listings_qs, 50)
         page_number = self.request.GET.get("page")
         page_obj = paginator.get_page(page_number)
 

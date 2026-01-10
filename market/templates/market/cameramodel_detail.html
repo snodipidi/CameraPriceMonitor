@@ -121,6 +121,130 @@
     </div>
   {% endif %}
 
+  <!-- Extended Statistics -->
+  {% if extended_stats and extended_stats.count > 0 %}
+    <div class="analytics-section mb-5">
+      <h2 class="mb-4">Расширенная аналитика</h2>
+      
+      <div class="row g-3 mb-4">
+        <div class="col-md-3 col-sm-6">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                <path d="M5 6.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm1 3a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5z"/>
+              </svg>
+            </div>
+            <div class="stat-value">{{ extended_stats.median|floatformat:0 }} ₽</div>
+            <div class="stat-label">Медиана</div>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+              </svg>
+            </div>
+            <div class="stat-value">{{ extended_stats.std|floatformat:0 }} ₽</div>
+            <div class="stat-label">Стандартное отклонение</div>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+              </svg>
+            </div>
+            <div class="stat-value">{{ extended_stats.q25|floatformat:0 }} ₽</div>
+            <div class="stat-label">25-й перцентиль</div>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+              </svg>
+            </div>
+            <div class="stat-value">{{ extended_stats.q75|floatformat:0 }} ₽</div>
+            <div class="stat-label">75-й перцентиль</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Price Prediction -->
+      {% if price_prediction and price_prediction.predicted_price %}
+        <div class="prediction-card mb-4">
+          <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+              <h3 class="h5 mb-2">Прогноз цены</h3>
+              <p class="text-muted mb-0">
+                {% if price_prediction.trend == 'up' %}
+                  <span class="text-success">↗ Тренд: Рост</span>
+                {% elif price_prediction.trend == 'down' %}
+                  <span class="text-danger">↘ Тренд: Снижение</span>
+                {% else %}
+                  <span class="text-secondary">→ Тренд: Стабильный</span>
+                {% endif %}
+              </p>
+            </div>
+            <div class="text-end">
+              <div class="prediction-price">{{ price_prediction.predicted_price|floatformat:0 }} ₽</div>
+              <div class="text-muted small">Прогноз на 30 дней</div>
+              <div class="text-muted small">Уверенность: {{ price_prediction.confidence }}%</div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- Charts -->
+      <div class="charts-grid">
+        {% if price_distribution_chart %}
+          <div class="chart-card mb-4">
+            <div class="chart-container">
+              {{ price_distribution_chart|safe }}
+            </div>
+          </div>
+        {% endif %}
+
+        {% if price_timeline_chart %}
+          <div class="chart-card mb-4">
+            <div class="chart-container">
+              {{ price_timeline_chart|safe }}
+            </div>
+          </div>
+        {% endif %}
+
+        <div class="row g-4">
+          {% if price_by_source_chart %}
+            <div class="col-md-6">
+              <div class="chart-card">
+                <div class="chart-container">
+                  {{ price_by_source_chart|safe }}
+                </div>
+              </div>
+            </div>
+          {% endif %}
+
+          {% if price_by_condition_chart %}
+            <div class="col-md-6">
+              <div class="chart-card">
+                <div class="chart-container">
+                  {{ price_by_condition_chart|safe }}
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
   <!-- Listings Section -->
   <div class="listings-section">
     <div class="d-flex justify-content-between align-items-center mb-4">
