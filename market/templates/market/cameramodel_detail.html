@@ -249,7 +249,63 @@
   <div class="listings-section">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="mb-0">Объявления</h2>
-      <span class="text-muted small">{{ stats.count|default:0 }} объявл.</span>
+      <span class="text-muted small">
+        {% if filtered_count %}
+          Показано: {{ filtered_count }} из {{ stats.count|default:0 }}
+        {% else %}
+          {{ stats.count|default:0 }} объявл.
+        {% endif %}
+      </span>
+    </div>
+
+    <!-- Filters and Sort -->
+    <div class="listings-filters mb-4">
+      <form method="get" class="row g-3 align-items-end">
+        <div class="col-md-3 col-sm-6">
+          <label for="sort" class="form-label small text-muted mb-1">Сортировка</label>
+          <select name="sort" id="sort" class="form-select form-select-sm">
+            <option value="-fetched_at" {% if current_sort == '-fetched_at' or not current_sort %}selected{% endif %}>Дата обновления (новые)</option>
+            <option value="fetched_at" {% if current_sort == 'fetched_at' %}selected{% endif %}>Дата обновления (старые)</option>
+            <option value="price_asc" {% if current_sort == 'price_asc' %}selected{% endif %}>Цена: по возрастанию</option>
+            <option value="price_desc" {% if current_sort == 'price_desc' %}selected{% endif %}>Цена: по убыванию</option>
+            <option value="date_posted_desc" {% if current_sort == 'date_posted_desc' %}selected{% endif %}>Дата публикации (новые)</option>
+            <option value="date_posted_asc" {% if current_sort == 'date_posted_asc' %}selected{% endif %}>Дата публикации (старые)</option>
+          </select>
+        </div>
+        
+        <div class="col-md-3 col-sm-6">
+          <label for="region" class="form-label small text-muted mb-1">Регион</label>
+          <input type="text" name="region" id="region" class="form-control form-control-sm" 
+                 value="{{ current_region }}" placeholder="Например: Москва">
+        </div>
+        
+        <div class="col-md-2 col-sm-6">
+          <label for="condition" class="form-label small text-muted mb-1">Состояние</label>
+          <select name="condition" id="condition" class="form-select form-select-sm">
+            <option value="">Все</option>
+            {% for value, label in available_conditions %}
+              <option value="{{ value }}" {% if current_condition == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        
+        <div class="col-md-2 col-sm-6">
+          <label for="source" class="form-label small text-muted mb-1">Источник</label>
+          <select name="source" id="source" class="form-select form-select-sm">
+            <option value="">Все</option>
+            {% for value, label in available_sources %}
+              <option value="{{ value }}" {% if current_source == value %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+          </select>
+        </div>
+        
+        <div class="col-md-2 col-sm-12">
+          <button type="submit" class="btn btn-primary btn-sm w-100">Применить</button>
+          {% if current_region or current_condition or current_source or current_sort != '-fetched_at' %}
+            <a href="{% url 'camera_detail' camera.id %}" class="btn btn-outline-secondary btn-sm w-100 mt-2">Сбросить</a>
+          {% endif %}
+        </div>
+      </form>
     </div>
 
     {% if listings %}
@@ -264,8 +320,8 @@
                 </svg>
                 Выгодно
               </div>
-            {% endif %}
-            
+    {% endif %}
+
             <div class="listing-header">
               <div class="listing-price">
                 {{ listing.price|floatformat:0 }} {{ listing.currency }}
@@ -304,9 +360,9 @@
                   </svg>
                   {{ listing.posted_date|date:"d.m.Y" }}
                 </div>
-              {% endif %}
-            </div>
-            
+    {% endif %}
+  </div>
+
             <div class="listing-footer">
               <a href="{{ listing.url }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">
                 Открыть на площадке
@@ -331,19 +387,25 @@
 
     <!-- Pagination -->
     {% if page_obj.has_other_pages %}
+      {% with params="" %}
+        {% if current_sort %}{% with params=params|add:"&sort="|add:current_sort %}{% endwith %}{% endif %}
+        {% if current_region %}{% with params=params|add:"&region="|add:current_region %}{% endwith %}{% endif %}
+        {% if current_condition %}{% with params=params|add:"&condition="|add:current_condition %}{% endwith %}{% endif %}
+        {% if current_source %}{% with params=params|add:"&source="|add:current_source %}{% endwith %}{% endif %}
+      {% endwith %}
       <nav aria-label="Навигация по страницам" class="mt-4">
         <ul class="pagination justify-content-center">
           {% if page_obj.has_previous %}
             <li class="page-item">
-              <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Предыдущая">
+              <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if current_sort %}&sort={{ current_sort }}{% endif %}{% if current_region %}&region={{ current_region }}{% endif %}{% if current_condition %}&condition={{ current_condition }}{% endif %}{% if current_source %}&source={{ current_source }}{% endif %}" aria-label="Предыдущая">
                 <span aria-hidden="true">&laquo; Предыдущая</span>
               </a>
             </li>
-          {% else %}
+  {% else %}
             <li class="page-item disabled">
               <span class="page-link">&laquo; Предыдущая</span>
             </li>
-          {% endif %}
+  {% endif %}
 
           <li class="page-item active">
             <span class="page-link">
@@ -353,7 +415,7 @@
 
           {% if page_obj.has_next %}
             <li class="page-item">
-              <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Следующая">
+              <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if current_sort %}&sort={{ current_sort }}{% endif %}{% if current_region %}&region={{ current_region }}{% endif %}{% if current_condition %}&condition={{ current_condition }}{% endif %}{% if current_source %}&source={{ current_source }}{% endif %}" aria-label="Следующая">
                 <span aria-hidden="true">Следующая &raquo;</span>
               </a>
             </li>

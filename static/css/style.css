@@ -705,6 +705,32 @@ h1.mb-0 {
     border-top: 1px solid var(--border-color);
 }
 
+/* Listings Filters */
+.listings-filters {
+    background: var(--background-white);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.listings-filters .form-label {
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.listings-filters .form-select,
+.listings-filters .form-control {
+    border-color: var(--border-color);
+    transition: all 0.2s ease;
+}
+
+.listings-filters .form-select:focus,
+.listings-filters .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(139, 90, 60, 0.1);
+}
+
 .pagination {
     margin-top: 2rem;
 }

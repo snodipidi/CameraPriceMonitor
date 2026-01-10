@@ -28,12 +28,17 @@ class CameraModelListView(ListView):
     def get_queryset(self):
         # Фильтр: только активные объявления с валидной ценой (больше 0)
         active_listings_filter = Q(listing__is_active=True) & Q(listing__price__gt=0)
-        return CameraModel.objects.select_related('brand').annotate(
+        queryset = CameraModel.objects.select_related('brand').annotate(
             listings_count=Count('listing', filter=active_listings_filter, distinct=True),
             avg_price=Avg('listing__price', filter=active_listings_filter),
             min_price=Min('listing__price', filter=active_listings_filter),
             max_price=Max('listing__price', filter=active_listings_filter),
         ).order_by('brand__name', 'name')
+        
+        # Удаляем модели, у которых нет активных объявлений (опционально)
+        # queryset = queryset.filter(listings_count__gt=0)
+        
+        return queryset
 
 
 class CameraModelDetailView(DetailView):
@@ -44,20 +49,64 @@ class CameraModelDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Получаем только активные объявления для модели с валидной ценой
-        listings_qs = Listing.objects.filter(
+        # Получаем все активные объявления для модели с валидной ценой (для графиков)
+        all_listings_qs = Listing.objects.filter(
             camera_model=self.object, 
             is_active=True,
             price__gt=0
-        ).order_by("-fetched_at")
+        )
+        
+        # Получаем отфильтрованные объявления для отображения
+        listings_qs = all_listings_qs
+        
+        # Фильтры из GET параметров
+        region_filter = self.request.GET.get('region', '')
+        condition_filter = self.request.GET.get('condition', '')
+        source_filter = self.request.GET.get('source', '')
+        
+        if region_filter:
+            listings_qs = listings_qs.filter(region__icontains=region_filter)
+        if condition_filter:
+            listings_qs = listings_qs.filter(condition=condition_filter)
+        if source_filter:
+            listings_qs = listings_qs.filter(source=source_filter)
+        
+        # Сортировка из GET параметров
+        sort_by = self.request.GET.get('sort', '-fetched_at')
+        valid_sorts = {
+            'price_asc': 'price',
+            'price_desc': '-price',
+            'date_asc': 'fetched_at',
+            'date_desc': '-fetched_at',
+            'date_posted_asc': 'posted_date',
+            'date_posted_desc': '-posted_date',
+        }
+        
+        if sort_by in valid_sorts:
+            listings_qs = listings_qs.order_by(valid_sorts[sort_by])
+        else:
+            listings_qs = listings_qs.order_by("-fetched_at")
+        
+        # Получаем уникальные значения для фильтров
+        context['available_regions'] = sorted(set(
+            all_listings_qs.values_list('region', flat=True).distinct()
+        ))
+        context['available_conditions'] = Listing.Condition.choices
+        context['available_sources'] = Listing.Source.choices
+        
+        # Сохраняем текущие значения фильтров
+        context['current_region'] = region_filter
+        context['current_condition'] = condition_filter
+        context['current_source'] = source_filter
+        context['current_sort'] = sort_by
         
         # Получаем историю цен из PriceSnapshot
         snapshots_qs = PriceSnapshot.objects.filter(
             listing__camera_model=self.object
         ).select_related('listing').order_by('checked_at')
 
-        # Базовая статистика через ORM
-        context["stats"] = listings_qs.aggregate(
+        # Базовая статистика через ORM (по всем объявлениям для графиков)
+        context["stats"] = all_listings_qs.aggregate(
             count=Count("id"),
             avg=Avg("price"),
             min=Min("price"),
@@ -68,10 +117,10 @@ class CameraModelDetailView(DetailView):
         avg_price = stats.get("avg") or 0
         context["good_deal_threshold"] = int(avg_price * 0.9)  # -10%
 
-        # Создаем DataFrame для аналитики
-        if listings_qs.exists():
+        # Создаем DataFrame для аналитики (используем все объявления, не отфильтрованные)
+        if all_listings_qs.exists():
             listings_data = []
-            for listing in listings_qs:
+            for listing in all_listings_qs:
                 listings_data.append({
                     'id': listing.id,
                     'price': listing.price,
@@ -137,6 +186,12 @@ class CameraModelDetailView(DetailView):
             context["price_by_condition_chart"] = ""
             context["price_prediction"] = None
 
+        # Статистика по отфильтрованным объявлениям (для отображения)
+        filtered_stats = listings_qs.aggregate(
+            count=Count("id"),
+        )
+        context["filtered_count"] = filtered_stats.get("count", 0)
+        
         # Пагинация для списка объявлений
         paginator = Paginator(listings_qs, 50)
         page_number = self.request.GET.get("page")
