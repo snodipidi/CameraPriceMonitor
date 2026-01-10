@@ -85,7 +85,7 @@
                     </svg>
                     {{ model.listings_count }} объявл.
                   </div>
-                  {% if model.min_price %}
+                  {% if model.min_price is not None and model.min_price > 0 %}
                     <div class="stat-price">
                       {% if model.min_price == model.max_price %}
                         {{ model.min_price|floatformat:0 }} ₽

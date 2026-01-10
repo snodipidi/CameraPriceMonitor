@@ -2,7 +2,7 @@ import pandas as pd
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
-from django.db.models import Avg, Min, Max, Count
+from django.db.models import Avg, Min, Max, Count, Q
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.generic import ListView, DetailView, CreateView
@@ -26,11 +26,13 @@ class CameraModelListView(ListView):
     context_object_name = "models"
     
     def get_queryset(self):
+        # Фильтр: только активные объявления с валидной ценой (больше 0)
+        active_listings_filter = Q(listing__is_active=True) & Q(listing__price__gt=0)
         return CameraModel.objects.select_related('brand').annotate(
-            listings_count=Count('listing', distinct=True),
-            avg_price=Avg('listing__price'),
-            min_price=Min('listing__price'),
-            max_price=Max('listing__price'),
+            listings_count=Count('listing', filter=active_listings_filter, distinct=True),
+            avg_price=Avg('listing__price', filter=active_listings_filter),
+            min_price=Min('listing__price', filter=active_listings_filter),
+            max_price=Max('listing__price', filter=active_listings_filter),
         ).order_by('brand__name', 'name')
 
 
@@ -42,8 +44,12 @@ class CameraModelDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Получаем все объявления для модели
-        listings_qs = Listing.objects.filter(camera_model=self.object).order_by("-fetched_at")
+        # Получаем только активные объявления для модели с валидной ценой
+        listings_qs = Listing.objects.filter(
+            camera_model=self.object, 
+            is_active=True,
+            price__gt=0
+        ).order_by("-fetched_at")
         
         # Получаем историю цен из PriceSnapshot
         snapshots_qs = PriceSnapshot.objects.filter(
