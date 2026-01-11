@@ -1,19 +1,158 @@
 {% extends "market/base.html" %}
+{% load static %}
+
+{% block title %}Мои отслеживания — CameraPriceMonitor{% endblock %}
+
 {% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="mb-0">Мои отслеживания</h1>
+    <div class="text-muted small">
+      Всего: <strong>{{ items|length }}</strong>
+    </div>
+  </div>
 
+  {% if items %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+      {% for data in items %}
+        {% with item=data.item stats=data.stats good_deals_count=data.good_deals_count best_price=data.best_price target_reached=data.target_reached %}
+          <div class="col">
+            <div class="watch-card {% if target_reached %}watch-card-success{% endif %}">
+              <div class="watch-card-header">
+                <div class="watch-camera-info">
+                  <div class="watch-brand">{{ item.camera_model.brand.name }}</div>
+                  <h3 class="watch-model">{{ item.camera_model.name }}</h3>
+                </div>
+                {% if not item.is_active %}
+                  <span class="badge bg-secondary">Неактивно</span>
+                {% endif %}
+              </div>
 
-  <h1>Мои отслеживания</h1>
+              <div class="watch-card-body">
+                <!-- Целевая цена -->
+                <div class="watch-target-section">
+                  <div class="watch-target-label">Целевая цена</div>
+                  <div class="watch-target-price">{{ item.target_price|floatformat:0 }} ₽</div>
+                </div>
 
-  <ul>
-  {% for w in items %}
-    <li>
-      {{ w.camera_model }} — цель: {{ w.target_price }}
-      (<a href="{% url 'watch_edit' w.id %}">изменить</a>)
-    </li>
-  {% empty %}
-    <li>Пока ничего не отслеживается</li>
-  {% endfor %}
-</ul>
+                <!-- Статус достижения цели -->
+                {% if target_reached %}
+                  <div class="watch-success-alert">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                      <path d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0z"/>
+                      <path d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l7-7z"/>
+                    </svg>
+                    <div>
+                      <strong>Цель достигнута!</strong>
+                      <div class="small">Найдено {{ good_deals_count }} выгодн{{ good_deals_count|pluralize:"ое,ых" }} предложени{{ good_deals_count|pluralize:"е,я" }}</div>
+                      {% if best_price %}
+                        <div class="watch-best-price">Лучшая цена: <strong>{{ best_price|floatformat:0 }} ₽</strong></div>
+                      {% endif %}
+                    </div>
+                  </div>
+                {% else %}
+                  <div class="watch-pending-alert">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                      <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                      <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+                    </svg>
+                    <div>
+                      <strong>Ожидание</strong>
+                      <div class="small">Пока нет предложений по целевой цене</div>
+                    </div>
+                  </div>
+                {% endif %}
 
+                <!-- Статистика -->
+                {% if stats.count > 0 %}
+                  <div class="watch-stats">
+                    <div class="watch-stat-item">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M0 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2V2a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2zm12 2H5a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1z"/>
+                      </svg>
+                      <span>{{ stats.count }} объявлени{{ stats.count|pluralize:"е,я" }}</span>
+                    </div>
+                    {% if stats.min_price %}
+                      <div class="watch-stat-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                          <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                        </svg>
+                        <span>От {{ stats.min_price|floatformat:0 }} ₽</span>
+                      </div>
+                    {% endif %}
+                    {% if stats.avg_price %}
+                      <div class="watch-stat-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                          <path d="M5 6.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm1 3a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5z"/>
+                        </svg>
+                        <span>Средняя: {{ stats.avg_price|floatformat:0 }} ₽</span>
+                      </div>
+                    {% endif %}
+                  </div>
+                {% else %}
+                  <div class="watch-stats-empty">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                      <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                      <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v8.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"/>
+                    </svg>
+                    <span>Нет объявлений</span>
+                  </div>
+                {% endif %}
 
+                <!-- Регион, если указан -->
+                {% if item.region %}
+                  <div class="watch-region">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                      <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+                    </svg>
+                    <span>{{ item.region }}</span>
+                  </div>
+                {% endif %}
+              </div>
+
+              <div class="watch-card-footer">
+                <div class="watch-actions">
+                  <a href="{% url 'camera_detail' item.camera_model.id %}" class="btn btn-primary btn-sm">
+                    Смотреть объявления
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16" style="margin-left: 0.5rem;">
+                      <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+                    </svg>
+                  </a>
+                  <div class="watch-actions-secondary">
+                    <a href="{% url 'watch_edit' item.id %}" class="btn btn-outline-secondary btn-sm" title="Изменить">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1 .468-.325z"/>
+                      </svg>
+                    </a>
+                    <a href="{% url 'watch_delete' item.id %}" class="btn btn-outline-danger btn-sm" title="Удалить">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+                <div class="watch-date small text-muted">
+                  Добавлено {{ item.created_at|date:"d.m.Y" }}
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endwith %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" viewBox="0 0 16 16" class="empty-icon">
+        <path d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0z"/>
+        <path d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l7-7z"/>
+      </svg>
+      <h3>Пока нет отслеживаний</h3>
+      <p class="text-muted">Начните отслеживать цены на интересующие вас модели камер</p>
+      <a href="{% url 'camera_list' %}" class="btn btn-primary mt-3">
+        Перейти к каталогу
+      </a>
+    </div>
+  {% endif %}
 {% endblock %}

@@ -4,7 +4,8 @@ from .views import (
     CameraModelDetailView,
     WatchItemCreateView,
     WatchListView,
-    WatchItemUpdateView
+    WatchItemUpdateView,
+    WatchItemDeleteView
 )
 
 urlpatterns = [
@@ -14,4 +15,5 @@ urlpatterns = [
     path("watchlist/", WatchListView.as_view(), name="watchlist"),
     path("accounts/", include("django.contrib.auth.urls")),
     path("watch/edit/<int:pk>/", WatchItemUpdateView.as_view(), name="watch_edit"),
+    path("watch/delete/<int:pk>/", WatchItemDeleteView.as_view(), name="watch_delete"),
 ]

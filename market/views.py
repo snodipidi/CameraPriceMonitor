@@ -6,7 +6,7 @@ from django.db.models import Avg, Min, Max, Count, Q
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.generic import ListView, DetailView, CreateView
-from django.views.generic import UpdateView
+from django.views.generic import UpdateView, DeleteView
 
 from .forms import WatchItemCreateForm
 from .models import CameraModel, Listing, WatchItem, PriceSnapshot
@@ -14,8 +14,6 @@ from .analytics import (
     calculate_price_statistics,
     create_price_distribution_chart,
     create_price_timeline_chart,
-    create_price_by_source_chart,
-    create_price_by_condition_chart,
     predict_price_trend,
 )
 
@@ -61,15 +59,9 @@ class CameraModelDetailView(DetailView):
         
         # Фильтры из GET параметров
         region_filter = self.request.GET.get('region', '')
-        condition_filter = self.request.GET.get('condition', '')
-        source_filter = self.request.GET.get('source', '')
         
         if region_filter:
             listings_qs = listings_qs.filter(region__icontains=region_filter)
-        if condition_filter:
-            listings_qs = listings_qs.filter(condition=condition_filter)
-        if source_filter:
-            listings_qs = listings_qs.filter(source=source_filter)
         
         # Сортировка из GET параметров
         sort_by = self.request.GET.get('sort', '-fetched_at')
@@ -91,13 +83,9 @@ class CameraModelDetailView(DetailView):
         context['available_regions'] = sorted(set(
             all_listings_qs.values_list('region', flat=True).distinct()
         ))
-        context['available_conditions'] = Listing.Condition.choices
-        context['available_sources'] = Listing.Source.choices
         
         # Сохраняем текущие значения фильтров
         context['current_region'] = region_filter
-        context['current_condition'] = condition_filter
-        context['current_source'] = source_filter
         context['current_sort'] = sort_by
         
         # Получаем историю цен из PriceSnapshot
@@ -124,8 +112,6 @@ class CameraModelDetailView(DetailView):
                 listings_data.append({
                     'id': listing.id,
                     'price': listing.price,
-                    'source': listing.source,
-                    'condition': listing.condition,
                     'region': listing.region,
                     'fetched_at': listing.fetched_at,
                     'posted_date': listing.posted_date,
@@ -152,17 +138,6 @@ class CameraModelDetailView(DetailView):
                 f"Динамика цен: {self.object}"
             )
             
-            context["price_by_source_chart"] = create_price_by_source_chart(
-                df_listings,
-                f"Сравнение цен по источникам: {self.object}"
-            )
-            
-            if 'condition' in df_listings.columns and df_listings['condition'].notna().any():
-                context["price_by_condition_chart"] = create_price_by_condition_chart(
-                    df_listings,
-                    f"Цены по состоянию: {self.object}"
-                )
-            
             # Прогнозирование тренда
             if len(df_listings) >= 3:
                 # Для прогноза используем историю цен из PriceSnapshot, если есть
@@ -182,8 +157,6 @@ class CameraModelDetailView(DetailView):
             context["extended_stats"] = calculate_price_statistics(pd.DataFrame())
             context["price_distribution_chart"] = ""
             context["price_timeline_chart"] = ""
-            context["price_by_source_chart"] = ""
-            context["price_by_condition_chart"] = ""
             context["price_prediction"] = None
 
         # Статистика по отфильтрованным объявлениям (для отображения)
@@ -240,6 +213,52 @@ class WatchListView(LoginRequiredMixin, ListView):
             .select_related("camera_model", "camera_model__brand")
             .order_by("-created_at")
         )
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Добавляем статистику для каждого отслеживания
+        items_with_stats = []
+        for item in context['items']:
+            # Получаем активные объявления для этой модели
+            listings = Listing.objects.filter(
+                camera_model=item.camera_model,
+                is_active=True,
+                price__gt=0
+            )
+            
+            # Фильтруем по региону, если указан
+            if item.region:
+                listings = listings.filter(region__icontains=item.region)
+            
+            # Статистика
+            stats = listings.aggregate(
+                count=Count("id"),
+                min_price=Min("price"),
+                avg_price=Avg("price"),
+                max_price=Max("price"),
+            )
+            
+            # Находим выгодные предложения (цена <= целевой)
+            good_deals = listings.filter(price__lte=item.target_price).count()
+            
+            # Минимальная цена среди выгодных предложений
+            best_price = None
+            if good_deals > 0:
+                best_listing = listings.filter(price__lte=item.target_price).order_by('price').first()
+                if best_listing:
+                    best_price = best_listing.price
+            
+            items_with_stats.append({
+                'item': item,
+                'stats': stats,
+                'good_deals_count': good_deals,
+                'best_price': best_price,
+                'target_reached': good_deals > 0,
+            })
+        
+        context['items'] = items_with_stats
+        return context
 
 class WatchItemUpdateView(LoginRequiredMixin, UpdateView):
     model = WatchItem
@@ -251,4 +270,16 @@ class WatchItemUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         messages.success(self.request, "Отслеживание обновлено")
+        return reverse("watchlist")
+
+
+class WatchItemDeleteView(LoginRequiredMixin, DeleteView):
+    model = WatchItem
+    template_name = "market/watchitem_confirm_delete.html"
+
+    def get_queryset(self):
+        return WatchItem.objects.filter(user=self.request.user)
+
+    def get_success_url(self):
+        messages.success(self.request, "Отслеживание удалено")
         return reverse("watchlist")

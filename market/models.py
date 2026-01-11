@@ -38,13 +38,6 @@ class CameraModel(models.Model):
 class Listing(models.Model):
     class Source(models.TextChoices):
         AVITO = "avito", "Avito"
-        YOULA = "youla", "Youla"
-        OTHER = "other", "Other"
-
-    class Condition(models.TextChoices):
-        NEW = "new", "New"
-        USED = "used", "Used"
-        PARTS = "parts", "For parts"
 
     # Объявление относится к конкретной модели камеры
     camera_model = models.ForeignKey(CameraModel, on_delete=models.CASCADE)
@@ -56,13 +49,6 @@ class Listing(models.Model):
     url = models.URLField(max_length=500)
     price = models.IntegerField()
     currency = models.CharField(max_length=10, default="RUB")
-
-    # Состояние
-    condition = models.CharField(
-        max_length=20,
-        choices=Condition.choices,
-        default=Condition.USED,
-    )
 
     region = models.CharField(max_length=120)
     seller_type = models.CharField(max_length=50, null=True, blank=True)
@@ -116,12 +102,6 @@ class WatchItem(models.Model):
     # Целевая цена
     target_price = models.IntegerField()
 
-    preferred_condition = models.CharField(
-        max_length=20,
-        choices=Listing.Condition.choices,
-        null=True,
-        blank=True,
-    )
     region = models.CharField(max_length=120, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)

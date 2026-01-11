@@ -649,16 +649,6 @@ h1.mb-0 {
     color: white;
 }
 
-.listing-source-youla {
-    background: #ffc107;
-    color: #000;
-}
-
-.listing-source-other {
-    background: var(--background-light);
-    color: var(--text-secondary);
-}
-
 .listing-title {
     font-size: 1.125rem;
     font-weight: 600;
@@ -828,5 +818,241 @@ h1.mb-0 {
     
     .prediction-price {
         font-size: 1.5rem;
+    }
+}
+
+/* Watchlist Styles */
+.watch-card {
+    background: var(--background-white);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.watch-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-color);
+}
+
+.watch-card-success {
+    border-left: 4px solid #10b981;
+}
+
+.watch-card-header {
+    padding: 1.5rem 1.5rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.watch-camera-info {
+    flex: 1;
+}
+
+.watch-brand {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.watch-model {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.4;
+}
+
+.watch-card-body {
+    padding: 1.5rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.watch-target-section {
+    padding: 1rem;
+    background: var(--background-light);
+    border-radius: var(--radius-md);
+    text-align: center;
+}
+
+.watch-target-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.watch-target-price {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.watch-success-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: #d1fae5;
+    border: 1px solid #10b981;
+    border-radius: var(--radius-md);
+    color: #065f46;
+}
+
+.watch-success-alert svg {
+    flex-shrink: 0;
+    color: #10b981;
+    margin-top: 0.125rem;
+}
+
+.watch-pending-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: #fef3c7;
+    border: 1px solid #f59e0b;
+    border-radius: var(--radius-md);
+    color: #92400e;
+}
+
+.watch-pending-alert svg {
+    flex-shrink: 0;
+    color: #f59e0b;
+    margin-top: 0.125rem;
+}
+
+.watch-best-price {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.watch-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.watch-stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.watch-stat-item svg {
+    flex-shrink: 0;
+    color: var(--primary-color);
+}
+
+.watch-stats-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 2rem 1rem;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.watch-stats-empty svg {
+    opacity: 0.5;
+}
+
+.watch-region {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.watch-region svg {
+    flex-shrink: 0;
+    color: var(--primary-color);
+}
+
+.watch-card-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border-color);
+    background: var(--background-light);
+}
+
+.watch-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.watch-actions-secondary {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+.watch-actions-secondary .btn {
+    padding: 0.375rem 0.75rem;
+}
+
+.watch-date {
+    margin-top: 0.75rem;
+    text-align: center;
+}
+
+/* Watch Form Styles */
+.camera-info-card {
+    padding: 1.5rem;
+    background: var(--background-light);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    margin-bottom: 1.5rem;
+}
+
+.camera-brand-form {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.camera-name-form {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .watch-card-header {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .watch-target-price {
+        font-size: 1.5rem;
+    }
+    
+    .watch-actions-secondary {
+        flex-wrap: wrap;
     }
 }

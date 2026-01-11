@@ -220,27 +220,6 @@
           </div>
         {% endif %}
 
-        <div class="row g-4">
-          {% if price_by_source_chart %}
-            <div class="col-md-6">
-              <div class="chart-card">
-                <div class="chart-container">
-                  {{ price_by_source_chart|safe }}
-                </div>
-              </div>
-            </div>
-          {% endif %}
-
-          {% if price_by_condition_chart %}
-            <div class="col-md-6">
-              <div class="chart-card">
-                <div class="chart-container">
-                  {{ price_by_condition_chart|safe }}
-                </div>
-              </div>
-            </div>
-          {% endif %}
-        </div>
       </div>
     </div>
   {% endif %}
@@ -279,29 +258,9 @@
                  value="{{ current_region }}" placeholder="Например: Москва">
         </div>
         
-        <div class="col-md-2 col-sm-6">
-          <label for="condition" class="form-label small text-muted mb-1">Состояние</label>
-          <select name="condition" id="condition" class="form-select form-select-sm">
-            <option value="">Все</option>
-            {% for value, label in available_conditions %}
-              <option value="{{ value }}" {% if current_condition == value %}selected{% endif %}>{{ label }}</option>
-            {% endfor %}
-          </select>
-        </div>
-        
-        <div class="col-md-2 col-sm-6">
-          <label for="source" class="form-label small text-muted mb-1">Источник</label>
-          <select name="source" id="source" class="form-select form-select-sm">
-            <option value="">Все</option>
-            {% for value, label in available_sources %}
-              <option value="{{ value }}" {% if current_source == value %}selected{% endif %}>{{ label }}</option>
-    {% endfor %}
-          </select>
-        </div>
-        
         <div class="col-md-2 col-sm-12">
           <button type="submit" class="btn btn-primary btn-sm w-100">Применить</button>
-          {% if current_region or current_condition or current_source or current_sort != '-fetched_at' %}
+          {% if current_region or current_sort != '-fetched_at' %}
             <a href="{% url 'camera_detail' camera.id %}" class="btn btn-outline-secondary btn-sm w-100 mt-2">Сбросить</a>
           {% endif %}
         </div>
@@ -326,9 +285,6 @@
               <div class="listing-price">
                 {{ listing.price|floatformat:0 }} {{ listing.currency }}
               </div>
-              <span class="listing-source-badge listing-source-{{ listing.source }}">
-                {{ listing.get_source_display }}
-              </span>
             </div>
             
             <h3 class="listing-title">
@@ -344,15 +300,6 @@
                 </svg>
                 {{ listing.region }}
               </div>
-              {% if listing.condition %}
-                <div class="listing-info-item">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-                  </svg>
-                  {{ listing.get_condition_display }}
-                </div>
-              {% endif %}
               {% if listing.posted_date %}
                 <div class="listing-info-item">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -390,14 +337,12 @@
       {% with params="" %}
         {% if current_sort %}{% with params=params|add:"&sort="|add:current_sort %}{% endwith %}{% endif %}
         {% if current_region %}{% with params=params|add:"&region="|add:current_region %}{% endwith %}{% endif %}
-        {% if current_condition %}{% with params=params|add:"&condition="|add:current_condition %}{% endwith %}{% endif %}
-        {% if current_source %}{% with params=params|add:"&source="|add:current_source %}{% endwith %}{% endif %}
       {% endwith %}
       <nav aria-label="Навигация по страницам" class="mt-4">
         <ul class="pagination justify-content-center">
           {% if page_obj.has_previous %}
             <li class="page-item">
-              <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if current_sort %}&sort={{ current_sort }}{% endif %}{% if current_region %}&region={{ current_region }}{% endif %}{% if current_condition %}&condition={{ current_condition }}{% endif %}{% if current_source %}&source={{ current_source }}{% endif %}" aria-label="Предыдущая">
+              <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if current_sort %}&sort={{ current_sort }}{% endif %}{% if current_region %}&region={{ current_region }}{% endif %}" aria-label="Предыдущая">
                 <span aria-hidden="true">&laquo; Предыдущая</span>
               </a>
             </li>
@@ -415,7 +360,7 @@
 
           {% if page_obj.has_next %}
             <li class="page-item">
-              <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if current_sort %}&sort={{ current_sort }}{% endif %}{% if current_region %}&region={{ current_region }}{% endif %}{% if current_condition %}&condition={{ current_condition }}{% endif %}{% if current_source %}&source={{ current_source }}{% endif %}" aria-label="Следующая">
+              <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if current_sort %}&sort={{ current_sort }}{% endif %}{% if current_region %}&region={{ current_region }}{% endif %}" aria-label="Следующая">
                 <span aria-hidden="true">Следующая &raquo;</span>
               </a>
             </li>
