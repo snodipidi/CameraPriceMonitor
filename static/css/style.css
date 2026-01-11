@@ -28,16 +28,75 @@ header {
     z-index: 1000;
 }
 
+.navbar-brand-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    position: relative;
+}
+
+.navbar-actions-left,
+.navbar-actions-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.navbar-actions-left {
+    justify-content: flex-start;
+}
+
+.navbar-actions-right {
+    justify-content: flex-end;
+}
+
 .navbar-brand {
-    font-weight: 700;
-    font-size: 1.5rem;
+    font-weight: 800;
+    font-size: 1.75rem;
     color: var(--primary-color) !important;
     text-decoration: none;
-    transition: color 0.2s ease;
+    transition: all 0.3s ease;
+    padding: 0.5rem 1.5rem;
+    border-radius: var(--radius-md);
+    display: inline-block;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    letter-spacing: -0.03em;
 }
 
 .navbar-brand:hover {
     color: var(--primary-hover) !important;
+    transform: translateY(-2px);
+    background: var(--background-light);
+}
+
+.navbar-brand-text {
+    font-weight: 800;
+    font-size: 1.75rem;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 50%, var(--primary-hover) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+    display: inline-block;
+}
+
+.navbar-brand-text::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 50%, var(--primary-hover) 100%);
+    border-radius: 2px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.navbar-brand:hover .navbar-brand-text::after {
+    opacity: 1;
 }
 
 .hero-section {
@@ -243,6 +302,40 @@ header {
 }
 
 @media (max-width: 768px) {
+    .navbar-brand-wrapper {
+        flex-wrap: wrap;
+    }
+    
+    .navbar-actions-left {
+        display: none;
+    }
+    
+    .navbar-brand {
+        order: 1;
+        flex: 1 1 100%;
+        text-align: center;
+        margin: 0.5rem 0;
+    }
+    
+    .navbar-brand-content {
+        justify-content: center;
+    }
+    
+    .navbar-actions-right {
+        order: 2;
+        flex: 1 1 100%;
+        justify-content: center;
+        margin-top: 0.5rem;
+    }
+    
+    .navbar-brand-text {
+        font-size: 1.5rem;
+    }
+    
+    .navbar-brand {
+        font-size: 1.5rem;
+    }
+    
     .hero-section {
         padding: 2rem 1.5rem;
     }
@@ -412,6 +505,10 @@ a:focus {
     padding: 1rem 1.5rem 1.5rem;
     border-top: 1px solid var(--border-color);
     background: var(--background-light);
+}
+
+.camera-card-footer .d-flex.flex-column {
+    gap: 0.75rem;
 }
 
 .camera-card-footer .btn {

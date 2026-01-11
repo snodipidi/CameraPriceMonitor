@@ -136,7 +136,7 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
 ]
-
+   
 import os
 # Эта папка создастся автоматически при команде collectstatic
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
