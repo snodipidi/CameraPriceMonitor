@@ -28,6 +28,7 @@ class CameraModel(models.Model):
     mount = models.CharField(max_length=50, null=True, blank=True)
     sensor_type = models.CharField(max_length=50, null=True, blank=True)
     avito_search_url = models.URLField(blank=True, default="")
+    image_url = models.URLField(blank=True, default="", help_text="Ссылка на изображение камеры")
 
 
     def __str__(self):
