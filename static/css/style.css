@@ -19,6 +19,57 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     color: var(--text-primary);
     line-height: 1.6;
+    background-color: #f8f9fa;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: rgba(139, 90, 60, 0.1);
+    border-radius: 50%;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.theme-toggle:hover {
+    background: rgba(139, 90, 60, 0.2);
+    color: var(--primary-color);
+    transform: scale(1.1);
+}
+
+.theme-icon {
+    position: absolute;
+    transition: all 0.3s ease;
+}
+
+.sun-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+
+.moon-icon {
+    opacity: 0;
+    transform: rotate(180deg) scale(0.8);
+}
+
+/* Dark theme icon states */
+.dark-theme .sun-icon {
+    opacity: 0;
+    transform: rotate(-180deg) scale(0.8);
+}
+
+.dark-theme .moon-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
 }
 
 /* Modern Header Styles */
@@ -54,30 +105,6 @@ body {
 
 .navbar-actions-right {
     justify-content: flex-end;
-}
-
-.navbar-brand-logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 48px;
-    height: 48px;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    border-radius: 12px;
-    color: white;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    box-shadow: var(--shadow-sm);
-}
-
-.navbar-brand-logo:hover {
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: var(--shadow-md);
-    color: white;
-}
-
-.brand-icon {
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
 }
 
 .navbar-brand-main {
@@ -1435,4 +1462,262 @@ h1.mb-0 {
   overflow-wrap: anywhere;
   word-break: break-word;
   line-height: 1.15;
+}
+
+/* Dark Theme Variables and Styles */
+.dark-theme {
+    --primary-color: #d4a574;
+    --primary-hover: #e6b885;
+    --secondary-color: #c49660;
+    --success-color: #b8824d;
+    --background-light: #161b22;
+    --background-white: #21262d;
+    --text-primary: #e6edf3;
+    --text-secondary: #7d8590;
+    --border-color: #30363d;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6), 0 4px 6px -2px rgba(0, 0, 0, 0.5);
+}
+
+.dark-theme body {
+    background-color: #0d1117 !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-theme html {
+    background-color: #0d1117 !important;
+}
+
+/* Dark theme header */
+.dark-theme .modern-header {
+    background: linear-gradient(135deg, #21262d 0%, #161b22 100%);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.dark-theme .navbar-brand-main:hover {
+    background: rgba(212, 165, 116, 0.1);
+}
+
+.dark-theme .user-info {
+    background: rgba(212, 165, 116, 0.1);
+    border: 1px solid rgba(212, 165, 116, 0.2);
+}
+
+.dark-theme .user-info:hover {
+    background: rgba(212, 165, 116, 0.15);
+    border-color: rgba(212, 165, 116, 0.3);
+}
+
+.dark-theme .nav-link-modern:hover {
+    color: var(--primary-color);
+    background: rgba(212, 165, 116, 0.15);
+}
+
+.dark-theme .theme-toggle {
+    background: rgba(212, 165, 116, 0.15);
+    color: var(--text-secondary);
+}
+
+.dark-theme .theme-toggle:hover {
+    background: rgba(212, 165, 116, 0.25);
+    color: var(--primary-color);
+}
+
+/* Dark theme cards */
+.dark-theme .feature-card,
+.dark-theme .card,
+.dark-theme .camera-card,
+.dark-theme .watch-card,
+.dark-theme .listing-card,
+.dark-theme .stat-card,
+.dark-theme .camera-detail-card {
+    background: var(--background-white);
+    border-color: var(--border-color);
+}
+
+.dark-theme .feature-card:hover,
+.dark-theme .card:hover,
+.dark-theme .camera-card:hover,
+.dark-theme .watch-card:hover,
+.dark-theme .listing-card:hover,
+.dark-theme .stat-card:hover {
+    border-color: var(--primary-color);
+}
+
+/* Dark theme hero sections */
+.dark-theme .hero-section {
+    background: linear-gradient(135deg, #d4a574 0%, #c49660 50%, #b8824d 100%);
+}
+
+.dark-theme .catalog-hero-section {
+    background: linear-gradient(135deg, #21262d 0%, #161b22 100%);
+    border-color: var(--border-color);
+}
+
+/* Dark theme buttons */
+.dark-theme .btn-primary {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #121212;
+}
+
+.dark-theme .btn-primary:hover {
+    background: var(--primary-hover);
+    border-color: var(--primary-hover);
+    color: #121212;
+}
+
+.dark-theme .btn-outline-primary {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.dark-theme .btn-outline-primary:hover {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #121212;
+}
+
+.dark-theme .modern-btn {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: #121212;
+}
+
+.dark-theme .modern-btn:hover {
+    color: #121212;
+}
+
+/* Dark theme badges and alerts */
+.dark-theme .badge {
+    background: var(--primary-color);
+    color: #121212;
+}
+
+.dark-theme .alert {
+    background: var(--background-white);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+/* Dark theme forms */
+.dark-theme .form-control,
+.dark-theme .form-select {
+    background: var(--background-white);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.dark-theme .form-control:focus,
+.dark-theme .form-select:focus {
+    background: var(--background-white);
+    border-color: var(--primary-color);
+    color: var(--text-primary);
+    box-shadow: 0 0 0 0.2rem rgba(212, 165, 116, 0.25);
+}
+
+/* Dark theme specific elements */
+.dark-theme .watch-target-section {
+    background: rgba(212, 165, 116, 0.1);
+}
+
+.dark-theme .watch-success-alert {
+    background: rgba(16, 185, 129, 0.2);
+    border-color: #10b981;
+    color: #10b981;
+}
+
+.dark-theme .watch-pending-alert {
+    background: rgba(245, 158, 11, 0.2);
+    border-color: #f59e0b;
+    color: #f59e0b;
+}
+
+.dark-theme .camera-info-card {
+    background: rgba(212, 165, 116, 0.1);
+    border-color: var(--border-color);
+}
+
+.dark-theme .listings-filters {
+    background: var(--background-white);
+    border-color: var(--border-color);
+}
+
+.dark-theme .prediction-card {
+    background: linear-gradient(135deg, #21262d 0%, #161b22 100%);
+    border-color: var(--border-color);
+}
+
+.dark-theme .chart-card {
+    background: var(--background-white);
+    border-color: var(--border-color);
+}
+
+/* Dark theme empty states */
+.dark-theme .empty-state {
+    background: var(--background-white);
+    border-color: var(--border-color);
+}
+
+/* Dark theme pagination */
+.dark-theme .page-link {
+    background: var(--background-white);
+    border-color: var(--border-color);
+    color: var(--primary-color);
+}
+
+.dark-theme .page-link:hover {
+    background: rgba(212, 165, 116, 0.1);
+    border-color: var(--primary-color);
+    color: var(--primary-hover);
+}
+
+.dark-theme .page-item.active .page-link {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #121212;
+}
+
+.dark-theme .page-item.disabled .page-link {
+    background: var(--background-light);
+    border-color: var(--border-color);
+    color: var(--text-secondary);
+}
+
+/* Dark theme source badges */
+.dark-theme .listing-source-avito {
+    background: #ff5636;
+    color: white;
+}
+
+/* Dark theme camera image containers */
+.dark-theme .camera-image-detail {
+    background: rgba(212, 165, 116, 0.1);
+    border-color: var(--border-color);
+}
+
+/* Dark theme spec badges */
+.dark-theme .spec-badge,
+.dark-theme .stat-badge {
+    background: rgba(212, 165, 116, 0.15);
+    color: var(--text-secondary);
+}
+
+/* Dark theme navbar brand text gradient fix */
+.dark-theme .navbar-brand-text {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Smooth transitions for theme switching */
+* {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+/* Override Bootstrap dark theme conflicts */
+.dark-theme .navbar-brand,
+.dark-theme .navbar-brand:hover {
+    color: var(--primary-color) !important;
 }
